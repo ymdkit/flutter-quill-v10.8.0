@@ -129,7 +129,7 @@ Color stringToColor(String? s,
   }
 
   if (!s.startsWith('#')) {
-    throw UnsupportedError('Color code not supported');
+    return originalColor ?? Colors.black;
   }
 
   var hex = s.replaceFirst('#', '');
