@@ -442,18 +442,11 @@ class _QuillEditorSelectionGestureDetectorBuilder
       return;
     }
 
-    if (Theme.of(_state.context).isCupertino) {
-      renderEditor!.selectPositionAt(
-        from: details.globalPosition,
-        cause: SelectionChangedCause.longPress,
-      );
-    } else {
-      renderEditor!.selectWordsInRange(
-        details.globalPosition - details.offsetFromOrigin,
-        details.globalPosition,
-        SelectionChangedCause.longPress,
-      );
-    }
+    renderEditor!.selectWordsInRange(
+      details.globalPosition - details.offsetFromOrigin,
+      details.globalPosition,
+      SelectionChangedCause.longPress,
+    );
   }
 
   bool _isPositionSelected(TapUpDetails details) {
@@ -600,15 +593,8 @@ class _QuillEditorSelectionGestureDetectorBuilder
     }
 
     if (delegate.selectionEnabled) {
-      if (Theme.of(_state.context).isCupertino) {
-        renderEditor!.selectPositionAt(
-          from: details.globalPosition,
-          cause: SelectionChangedCause.longPress,
-        );
-      } else {
-        renderEditor!.selectWord(SelectionChangedCause.longPress);
-        Feedback.forLongPress(_state.context);
-      }
+      renderEditor!.selectWord(SelectionChangedCause.longPress);
+      Feedback.forLongPress(_state.context);
     }
   }
 
