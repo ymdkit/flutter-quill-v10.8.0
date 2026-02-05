@@ -54,6 +54,11 @@ class QuillRawEditorState extends EditorState
   StreamSubscription<bool>? _keyboardVisibilitySubscription;
   bool _keyboardVisible = false;
 
+  /// Whether the keyboard is effectively visible.
+  /// Accounts for floating keyboards on iPad which don't change screen size
+  /// but still have an active text input connection.
+  bool get _effectiveKeyboardVisible => _keyboardVisible || hasConnection;
+
   // Selection overlay
   @override
   EditorTextSelectionOverlay? get selectionOverlay => _selectionOverlay;
@@ -510,7 +515,7 @@ class QuillRawEditorState extends EditorState
 
     _selectionOverlay?.handlesVisible = _shouldShowSelectionHandles();
 
-    if (!_keyboardVisible) {
+    if (!_effectiveKeyboardVisible) {
       // This will show the keyboard for all selection changes on the
       // editor, not just changes triggered by user gestures.
       requestKeyboard();
@@ -1011,7 +1016,7 @@ class QuillRawEditorState extends EditorState
       return;
     }
 
-    if (ignoreFocus || _keyboardVisible) {
+    if (ignoreFocus || _effectiveKeyboardVisible) {
       _onChangeTextEditingValue(ignoreFocus);
     } else {
       requestKeyboard();
