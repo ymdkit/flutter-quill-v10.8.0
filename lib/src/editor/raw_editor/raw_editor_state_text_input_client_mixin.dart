@@ -14,6 +14,9 @@ import 'raw_editor.dart';
 
 mixin RawEditorStateTextInputClientMixin on EditorState
     implements TextInputClient {
+  @override
+  bool onFocusReceived() => false;
+
   TextInputConnection? _textInputConnection;
   TextEditingValue? __lastKnownRemoteTextEditingValue;
 
