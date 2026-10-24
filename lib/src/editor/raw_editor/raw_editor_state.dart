@@ -53,6 +53,7 @@ class QuillRawEditorState extends EditorState
   KeyboardVisibilityController? _keyboardVisibilityController;
   StreamSubscription<bool>? _keyboardVisibilitySubscription;
   bool _keyboardVisible = false;
+  double _lastBottomViewInset = 0;
 
   /// Whether the keyboard is effectively visible.
   /// Accounts for floating keyboards on iPad which don't change screen size
@@ -965,6 +966,7 @@ class QuillRawEditorState extends EditorState
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     closeConnectionIfNeeded();
     _keyboardVisibilitySubscription?.cancel();
     HardwareKeyboard.instance.removeHandler(_hardwareKeyboardEvent);
@@ -1094,6 +1096,18 @@ class QuillRawEditorState extends EditorState
     }
   }
 
+  @override
+  void didChangeMetrics() {
+    if (!mounted || !_hasFocus) return;
+    final bottomViewInset = View.of(context).viewInsets.bottom;
+    final keyboardWasVisible = _lastBottomViewInset > 0;
+    _lastBottomViewInset = bottomViewInset;
+    // Android can hide the keyboard without closing its text input connection.
+    if (keyboardWasVisible && bottomViewInset == 0) {
+      widget.config.focusNode.unfocus();
+    }
+  }
+
   void _handleFocusChanged() {
     if (dirty) {
       requestKeyboard();
@@ -1105,6 +1119,7 @@ class QuillRawEditorState extends EditorState
     _cursorCont.startOrStopCursorTimerIfNeeded(_hasFocus, controller.selection);
     _updateOrDisposeSelectionOverlayIfNeeded();
     if (_hasFocus) {
+      _lastBottomViewInset = View.of(context).viewInsets.bottom;
       WidgetsBinding.instance.addObserver(this);
       _showCaretOnScreen();
     } else {

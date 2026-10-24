@@ -55,6 +55,58 @@ void main() {
       });
     });
 
+    for (final closeConnection in [true, false]) {
+      testWidgets(
+          'Keyboard close releases focus and allows typing again (connection: $closeConnection)',
+          (tester) async {
+        addTearDown(tester.view.resetViewInsets);
+        final controller = QuillController.basic();
+        final focusNode = FocusNode();
+        await tester.pumpWidget(
+          QuillTestApp.withScaffold(
+            QuillEditor.basic(
+              controller: controller,
+              focusNode: focusNode,
+            ),
+          ),
+        );
+
+        for (var cycle = 0; cycle < 3; cycle++) {
+          await tester.tap(find.byType(QuillEditor));
+          await tester.pump();
+          expect(focusNode.hasFocus, isTrue);
+          expect(tester.testTextInput.hasAnyClients, isTrue);
+          final text = 'x' * (cycle + 1);
+          await tester.quillUpdateEditingValueWithSelection(
+            find.byType(QuillEditor),
+            '$text\n',
+            TextSelection.collapsed(offset: text.length),
+          );
+          await tester.pump();
+          expect(controller.document.toPlainText(), '$text\n');
+
+          if (closeConnection) {
+            tester.testTextInput.closeConnection();
+          } else {
+            tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+            await tester.pump();
+            tester.view.viewInsets = const FakeViewPadding(bottom: 150);
+            await tester.pump();
+            expect(focusNode.hasFocus, isTrue);
+            tester.view.resetViewInsets();
+          }
+          await tester.pump();
+          expect(focusNode.hasFocus, isFalse);
+          expect(tester.takeException(), isNull);
+          await tester.pump(const Duration(seconds: 1));
+        }
+
+        await tester.pumpWidget(const SizedBox());
+        focusNode.dispose();
+        controller.dispose();
+      });
+    }
+
     group('1189 - The provided text position is not in the current node', () {
       late QuillController controller;
       late QuillEditor editor;

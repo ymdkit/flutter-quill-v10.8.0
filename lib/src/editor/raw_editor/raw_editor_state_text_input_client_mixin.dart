@@ -383,6 +383,7 @@ mixin RawEditorStateTextInputClientMixin on EditorState
     _textInputConnection!.connectionClosedReceived();
     _textInputConnection = null;
     _lastKnownRemoteTextEditingValue = null;
+    widget.config.focusNode.unfocus();
   }
 
   void _updateSizeAndTransform() {
