@@ -51,11 +51,7 @@ dependencies:
 
   # Plugins
   url_launcher: ^6.2.1
-  flutter_keyboard_visibility_temp_fork:
-    git:
-      url: https://github.com/ymdkit/flutter_keyboard_visibility_temp_fork.git
-      ref: 8ed55ec3b3c17b4f226f17c535026587a4fd2476
-      path: flutter_keyboard_visibility_temp_fork
+  flutter_keyboard_visibility_temp_fork: ^0.1.1
   quill_native_bridge: ^11.1.0
 
 dev_dependencies:
